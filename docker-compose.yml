@@ -1,0 +1,35 @@
+version: '3'
+services:
+  be:
+    container_name: api-be
+    build:
+      context: docker/php
+      args:
+        UID: $U_ID
+    environment:
+      PHP_IDE_CONFIG: "serverName=Docker"
+      PHP_XDEBUG_ENABLED: 1
+      XDEBUG_CONFIG: remote_host=172.17.0.1 remote_port=9005
+    ports:
+      - 85:80
+    volumes:
+      - ./:/appdata/www
+      - ./docker/php/xdebug-linux.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    depends_on:
+      - db
+
+  db:
+    container_name: api-db
+    image: mysql:5.7
+    ports:
+      - '3310:3306'
+    environment:
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:
